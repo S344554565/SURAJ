@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MR SURAJ | Facebook API Dashboard</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b1020;
+    color: white;
+}
+
+header {
+    background: #151d35;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #3867ff;
+}
+
+header h1 {
+    margin: 0;
+    color: #70a0ff;
+}
+
+header p {
+    color: #b9c6e6;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+nav button {
+    background: #253353;
+    color: white;
+}
+
+nav button:hover {
+    background: #3867ff;
+}
+
+.container {
+    max-width: 750px;
+    margin: 15px auto;
+    padding: 20px;
+}
+
+.card {
+    background: #151d35;
+    padding: 22px;
+    margin-bottom: 18px;
+    border-radius: 14px;
+    border: 1px solid #283656;
+}
+
+h2 {
+    color: #80aaff;
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 7px;
+    color: #d8e1fa;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    background: #0b1020;
+    color: white;
+    border: 1px solid #354568;
+    border-radius: 8px;
+}
+
+.primary {
+    background: #3867ff;
+    color: white;
+}
+
+.danger {
+    background: #e34252;
+    color: white;
+}
+
+.success {
+    background: #168c65;
+    color: white;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    background: #0b1020;
+    border: 1px solid #283656;
+    padding: 18px;
+    border-radius: 10px;
+}
+
+.stat strong {
+    display: block;
+    margin-top: 10px;
+    font-size: 23px;
+    color: #70a0ff;
+}
+
+#logs {
+    height: 180px;
+    overflow-y: auto;
+    background: #080c17;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.log {
+    padding: 7px 0;
+    border-bottom: 1px solid #202b42;
+}
+
+.status {
+    color: #ffc857;
+    font-weight: bold;
+}
+
+footer {
+    text-align: center;
+    padding: 22px;
+    color: #91a0c1;
+}
+
+@media(max-width: 500px) {
+    .container {
+        padding: 12px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>MR SURAJ</h1>
+    <p>Facebook API Control Dashboard</p>
+</header>
+
+<nav>
+    <button onclick="showPage('settings')">
+        Page 1 — Settings
+    </button>
+
+    <button onclick="showPage('dashboard')">
+        Page 2 — Live Dashboard
+    </button>
+</nav>
+
+<div class="container">
+
+    <!-- PAGE 1 -->
+    <section id="settings" class="page active">
+
+        <div class="card">
+            <h2>Account Settings</h2>
+
+            <label for="firstName">Name Here</label>
+            <input
+                id="firstName"
+                type="text"
+                placeholder="Enter first name"
+            >
+
+            <label for="lastName">Last Name</label>
+            <input
+                id="lastName"
+                type="text"
+                placeholder="Enter last name"
+            >
+
+            <label for="apiToken">Facebook API Token</label>
+            <input
+                id="apiToken"
+                type="password"
+                placeholder="Paste authorized API token"
+                autocomplete="off"
+            >
+
+            <label for="duration">Time (minutes)</label>
+            <input
+                id="duration"
+                type="number"
+                min="1"
+                max="1440"
+                value="60"
+            >
+
+            <label for="importFile">Import File</label>
+            <input
+                id="importFile"
+                type="file"
+            >
+
+            <p id="fileInfo">No file selected.</p>
+
+            <div class="actions">
+                <button
+                    class="primary"
+                    onclick="saveSettings()"
+                >
+                    Save Settings
+                </button>
+
+                <button
+                    class="success"
+                    onclick="showPage('dashboard')"
+                >
+                    Open Dashboard
+                </button>
+            </div>
+
+            <p style="color:#91a0c1;font-size:13px">
+                Demo mode: Token is not sent to any server
+                or saved permanently.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- PAGE 2 -->
+    <section id="dashboard" class="page">
+
+        <div class="card">
+            <h2>Live Dashboard</h2>
+
+            <p>
+                Status:
+                <span class="status" id="status">
+                    STOPPED
+                </span>
+            </p>
+
+            <div class="stats">
+
+                <div class="stat">
+                    Name
+                    <strong id="displayName">Not set</strong>
+                </div>
+
+                <div class="stat">
+                    Runtime
+                    <strong id="runtime">00:00:00</strong>
+                </div>
+
+                <div class="stat">
+                    Selected Time
+                    <strong id="displayDuration">60 min</strong>
+                </div>
+
+                <div class="stat">
+                    API Connection
+                    <strong id="connection">DEMO</strong>
+                </div>
+
+            </div>
+
+            <div class="actions">
+
+                <button
+                    class="success"
+                    onclick="startDemo()"
+                >
+                    START
+                </button>
+
+                <button
+                    class="danger"
+                    onclick="stopDemo()"
+                >
+                    STOP
+                </button>
+
+                <button
+                    onclick="clearLogs()"
+                    style="background:#35415d;color:white"
+                >
+                    Clear Logs
+                </button>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Live Activity Logs</h2>
+            <div id="logs">
+                <div class="log">
+                    Dashboard initialized.
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+
+<footer>
+    OWNER MR SURAJ | API DASHBOARD
+</footer>
+
+<script>
+let running = false;
+let startTime = 0;
+let elapsedBeforePause = 0;
+let timerInterval = null;
+let endTime = 0;
+
+function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active");
+    });
+
+    document.getElementById(pageId).classList.add("active");
+}
+
+function addLog(message) {
+    const logs = document.getElementById("logs");
+    const entry = document.createElement("div");
+
+    entry.className = "log";
+
+    entry.textContent =
+        new Date().toLocaleTimeString() + " — " + message;
+
+    logs.prepend(entry);
+}
+
+document.getElementById("importFile")
+    .addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (!file) return;
+
+        document.getElementById("fileInfo").textContent =
+            "Selected: " + file.name +
+            " (" + Math.ceil(file.size / 1024) + " KB)";
+
+        addLog("File selected: " + file.name);
+    });
+
+function saveSettings() {
+    const first = document.getElementById("firstName").value.trim();
+    const last = document.getElementById("lastName").value.trim();
+
+    const minutes = Number(
+        document.getElementById("duration").value
+    );
+
+    if (!Number.isFinite(minutes) || minutes < 1 || minutes > 1440) {
+        alert("Enter a duration between 1 and 1440 minutes.");
+        return;
+    }
+
+    document.getElementById("displayName").textContent =
+        [first, last].filter(Boolean).join(" ") || "Not set";
+
+    document.getElementById("displayDuration").textContent =
+        minutes + " min";
+
+    addLog("Settings updated.");
+
+    alert("Settings updated in this browser session.");
+}
+
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return [hours, minutes, secs]
+        .map(value => String(value).padStart(2, "0"))
+        .join(":");
+}
+
+function updateRuntime() {
+    if (!running) return;
+
+    const elapsed = elapsedBeforePause +
+        Math.floor((Date.now() - startTime) / 1000);
+
+    document.getElementById("runtime").textContent =
+        formatTime(elapsed);
+
+    if (Date.now() >= endTime) {
+        stopDemo();
+        addLog("Demo duration completed.");
+    }
+}
+
+function startDemo() {
+    if (running) {
+        addLog("Demo is already running.");
+        return;
+    }
+
+    const minutes = Number(
+        document.getElementById("duration").value
+    );
+
+    if (!Number.isFinite(minutes) || minutes < 1 || minutes > 1440) {
+        alert("Set a valid duration first.");
+        return;
+    }
+
+    running = true;
+    startTime = Date.now();
+
+    endTime = startTime +
+        Math.max(0, minutes * 60 - elapsedBeforePause) * 1000;
+
+    document.getElementById("status").textContent = "RUNNING";
+    document.getElementById("status").style.color = "#36d399";
+
+    addLog("Demo started.");
+
+    timerInterval = setInterval(updateRuntime, 1000);
+    updateRuntime();
+}
+
+function stopDemo() {
+    if (running) {
+        elapsedBeforePause += Math.floor(
+            (Date.now() - startTime) / 1000
+        );
+    }
+
+    running = false;
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    document.getElementById("status").textContent = "STOPPED";
+    document.getElementById("status").style.color = "#ffc857";
+
+    addLog("Demo stopped.");
+}
+
+function clearLogs() {
+    document.getElementById("logs").replaceChildren();
+    addLog("Logs cleared.");
+}
+</script>
+
+</body>
+</html>
